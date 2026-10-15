@@ -1,9 +1,13 @@
+
 package de.htwberlin.mywatchlist.controller;
 
 import de.htwberlin.mywatchlist.model.WatchlistEntry;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import de.htwberlin.mywatchlist.service.WatchlistService;
+
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 import java.util.List;
 
 @RestController
@@ -13,21 +17,27 @@ import java.util.List;
 })
 public class WatchlistController {
 
+    private final WatchlistService service;
+
+    public WatchlistController(WatchlistService service) {
+        this.service = service;
+    }
+
+    // Alle Einträge abrufen
     @GetMapping("/watchlist")
     public List<WatchlistEntry> getWatchlist() {
-        return List.of(
-                new WatchlistEntry(
-                        1L, "Breaking Bad", "Serie",
-                        "Abgeschlossen", 10
-                ),
-                new WatchlistEntry(
-                        2L, "Interstellar", "Film",
-                        "Abgeschlossen", 9
-                ),
-                new WatchlistEntry(
-                        3L, "Dark", "Serie",
-                        "Geplant", null
-                )
-        );
+        return service.getAllEntries();
+    }
+
+    // Neuen Eintrag speichern
+    @PostMapping("/watchlist")
+    public ResponseEntity<WatchlistEntry> addEntry(
+            @RequestBody WatchlistEntry entry) {
+
+        WatchlistEntry savedEntry = service.addEntry(entry);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(savedEntry);
     }
 }
