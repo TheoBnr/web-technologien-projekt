@@ -40,4 +40,27 @@ public class WatchlistController {
                 .status(HttpStatus.CREATED)
                 .body(savedEntry);
     }
+
+    // Bestehenden Eintrag bearbeiten
+    @PutMapping("/watchlist/{id}")
+    public ResponseEntity<WatchlistEntry> updateEntry(
+            @PathVariable Long id,
+            @RequestBody WatchlistEntry entry) {
+
+        WatchlistEntry updatedEntry =
+                service.updateEntry(id, entry);
+
+        return ResponseEntity.ok(updatedEntry);
+    }
+
+    // Eintrag löschen
+    @DeleteMapping("/watchlist/{id}")
+    public ResponseEntity<Void> deleteEntry(
+            @PathVariable Long id) {
+
+        service.deleteEntry(id);
+
+        return ResponseEntity.noContent().build();
+    }
+
 }
