@@ -1,8 +1,11 @@
 
 package de.htwberlin.mywatchlist.controller;
 
+import de.htwberlin.mywatchlist.dto.WatchlistEntryRequest;
 import de.htwberlin.mywatchlist.model.WatchlistEntry;
 import de.htwberlin.mywatchlist.service.WatchlistService;
+
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.HttpStatus;
@@ -32,9 +35,10 @@ public class WatchlistController {
     // Neuen Eintrag speichern
     @PostMapping("/watchlist")
     public ResponseEntity<WatchlistEntry> addEntry(
-            @RequestBody WatchlistEntry entry) {
+            @Valid @RequestBody WatchlistEntryRequest request) {
 
-        WatchlistEntry savedEntry = service.addEntry(entry);
+        WatchlistEntry savedEntry =
+                service.addEntry(toEntry(request));
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -45,10 +49,10 @@ public class WatchlistController {
     @PutMapping("/watchlist/{id}")
     public ResponseEntity<WatchlistEntry> updateEntry(
             @PathVariable Long id,
-            @RequestBody WatchlistEntry entry) {
+            @Valid @RequestBody WatchlistEntryRequest request) {
 
         WatchlistEntry updatedEntry =
-                service.updateEntry(id, entry);
+                service.updateEntry(id, toEntry(request));
 
         return ResponseEntity.ok(updatedEntry);
     }
@@ -63,4 +67,14 @@ public class WatchlistController {
         return ResponseEntity.noContent().build();
     }
 
+    // DTO in Entity umwandeln
+    private WatchlistEntry toEntry(WatchlistEntryRequest request) {
+        return new WatchlistEntry(
+                null,
+                request.title().trim(),
+                request.type(),
+                request.status(),
+                request.rating()
+        );
+    }
 }
